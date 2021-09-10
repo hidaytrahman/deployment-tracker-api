@@ -8,7 +8,6 @@ const DeploymentSchema = new mongoose.Schema({
     },
     version: {
         type: [String],
-        unique: true,
         required: true
         
     },

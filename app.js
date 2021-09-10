@@ -18,7 +18,17 @@ app.listen(port, () => {
 
 // Landing Route
 app.get('/', (req, res, next) => {
-    res.send("Welcome to ejam");
+    res.send(`
+        <div style="text-align:center;  max-width: 1024px;
+        margin: 0 auto;
+        padding: 4%;
+        font-size: 3rem;
+        background: #f7efef;
+        border-radius: 33px;">
+        <img src="https://www.ejam.com/assets/images/ejam_logo_Black.png" />
+        <h1>Welcome to ejam!</h1>
+        </div>
+    `);
 });
 
 

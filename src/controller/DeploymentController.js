@@ -12,32 +12,33 @@ module.exports = {
     /*========== Create Deployment =============*/
     addDeployment: async (req, res) => {
 
-        const { URL, templateName, version } = req.body;
+        try {
+
+            const { URL, templateName, version } = req.body;
+
+            // check if all fields are present
+            if (URL && templateName && version) {
+
+                // check if template is already exists
+                const data = await DeploymentSchema.findOne({ templateName: templateName });
+
+                console.log(' data ', data);
+
+                if (!data) {
+                    const doc = new DeploymentSchema({
+                        name: URL,
+                        templateName: templateName,
+                        version: [version]
+                    });
+
+                    console.log(version)
+                    console.log('...version ', [version])
 
 
-
-        // check if all fields are present
-        if (URL && templateName && version) {
-
-            const data = await DeploymentSchema.findOne({ templateName: templateName });
-
-            console.log(' data ', data);
-
-            if (!data) {
-                const doc = new DeploymentSchema({
-                    name: URL,
-                    templateName: templateName,
-                    version: [version]
-                });
-
-                console.log(version)
-                console.log('...version ',[version])
+                    //save in to the DB
+                    doc.save((err, result) => {
 
 
-                //save in to the DB
-                doc.save((err, result) => {
-
-                    try {
 
                         // throw an error if any
                         if (err) {
@@ -51,36 +52,46 @@ module.exports = {
                         res.status(200).json({
                             message: "Deployment has been added successfully !!!"
                         });
+
                         console.log('result ', result);
-                    }
-                    catch (error) {
-                        res.status(400).json({
-                            message: error.message
+
+
+                    });
+                } else {
+
+                    const filter = { templateName };
+                    const update = { version: [...data.version, version] };
+
+                    let doc = await DeploymentSchema.findOneAndUpdate(filter, update);
+
+                    console.log('doc ', doc)
+                    console.log('[...data.version, version] ', [...data.version, version]);
+
+                    if (doc) {
+                        res.status(200).json({
+                            message: `Version against ${templateName} has been added successfully`
                         });
-                    };
+                    }
 
-                });
+
+
+
+                }
+
+
+
             } else {
-
-                const filter = {templateName};
-                const update = { version: [...data.version, version] };
-
-                let doc = await DeploymentSchema.findOneAndUpdate(filter, update);
-
-                console.log('doc ' , doc)
-                console.log('[...data.version, version] ',[...data.version, version])
-                res.status(200).json({
-                    message: "Update version here"
-                });
+                return res.status(400).json({
+                    message: "All fields are mandatory!"
+                })
             }
 
-
-
-        } else {
-            return res.status(400).json({
-                message: "All fields are mandatory!"
-            })
         }
+        catch (error) {
+            res.status(400).json({
+                message: "Something went wrong :("
+            });
+        };
     },
 
 
