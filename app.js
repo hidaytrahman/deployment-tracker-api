@@ -7,10 +7,8 @@ const port = process.env.PORT || 3200;
 // body parser
 app.use(express.json());
 
-
 // DB Config
 require('./src/config/DB')();
-
 
 // Landing Route
 app.get('/', (req, res, next) => {
@@ -34,7 +32,7 @@ require("./src/routes/Routes")(app);
 
 // production app will not show any log or port
 if (process.env.NODE_ENV === 'production') {
-    server.app.listen(process.env.PORT);
+    app.listen(process.env.PORT);
 } else {
     app.listen(port, () => {
         console.log(`app listening on port: ${port}`);
