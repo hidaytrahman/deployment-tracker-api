@@ -8,8 +8,8 @@ Content-Type: application/json
 
 {
     "URL": "https://www.npoint.io/docs/8f7cf8628b367ffd50a2",
-    "templateName": "Astma",
-    "version": "1.0.1"
+    "templateName": "Bhoot",
+    "version": "1.1.2"
 }
 
 

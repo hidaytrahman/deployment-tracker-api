@@ -4,8 +4,16 @@ module.exports = {
 
     /*========== Get Deployment =============*/
     getDeployment: async (req, res) => {
-        const data = await DeploymentSchema.find();
-        res.json(data);
+        try {
+            const data = await DeploymentSchema.find();
+            res.json(data);
+
+        } catch (err) {
+            res.status(400).json({
+                message: "Something went wrong :("
+            });
+        }
+
     },
 
 
@@ -13,7 +21,6 @@ module.exports = {
     addDeployment: async (req, res) => {
 
         try {
-
             const { URL, templateName, version } = req.body;
 
             // check if all fields are present
@@ -22,23 +29,16 @@ module.exports = {
                 // check if template is already exists
                 const data = await DeploymentSchema.findOne({ templateName: templateName });
 
-                console.log(' data ', data);
-
                 if (!data) {
                     const doc = new DeploymentSchema({
                         name: URL,
                         templateName: templateName,
-                        version: [version]
+                        version: [version] // add version as an array
                     });
-
-                    console.log(version)
-                    console.log('...version ', [version])
 
 
                     //save in to the DB
                     doc.save((err, result) => {
-
-
 
                         // throw an error if any
                         if (err) {
@@ -53,26 +53,31 @@ module.exports = {
                             message: "Deployment has been added successfully !!!"
                         });
 
-                        console.log('result ', result);
-
-
                     });
+
                 } else {
 
-                    const filter = { templateName };
-                    const update = { version: [...data.version, version] };
+                    // check if the version is exist
+                    console.log(' data.version ', data.version);
 
-                    let doc = await DeploymentSchema.findOneAndUpdate(filter, update);
+                    const versionExists = data.version.filter((item) => item === version);
 
-                    console.log('doc ', doc)
-                    console.log('[...data.version, version] ', [...data.version, version]);
+                    if (versionExists && versionExists.length > 0) {
+                        return res.status(400).json({
+                            message: `This version (${version}) is already exists`
+                        })
+                    } else {
+                        const filter = { templateName };
+                        const update = { version: [...data.version, version] };
 
-                    if (doc) {
-                        res.status(200).json({
-                            message: `Version against ${templateName} has been added successfully`
-                        });
+                        let doc = await DeploymentSchema.findOneAndUpdate(filter, update);
+
+                        if (doc) {
+                            res.status(200).json({
+                                message: `Version (${version}) against ${templateName} has been added successfully`
+                            });
+                        }
                     }
-
 
 
 
@@ -97,33 +102,41 @@ module.exports = {
 
     /*========== delete Deployment =============*/
     deleteDeployment: (req, res) => {
-        const templateName = req.body.templateName;
+        try {
+            const templateName = req.body.templateName;
 
-        // only proceed if templateName is in the request body
-        if (templateName) {
+            // only proceed if templateName is in the request body
+            if (templateName) {
 
-            DeploymentSchema.findOneAndDelete({ templateName: templateName }, (err, result) => {
-                if (err) throw err;
+                DeploymentSchema.findOneAndDelete({ templateName: templateName }, (err, result) => {
+                    if (err) throw err;
 
-                console.log(' result ', result);
+                    console.log(' result ', result);
 
-                // if exist delete
-                if (result) {
-                    res.status(200).json({
-                        message: `${templateName} : deployment has been deleted.`
-                    });
-                } else {
-                    res.status(200).json({
-                        message: `${templateName} : Doesn't exist.`
-                    });
-                }
+                    // if exist delete
+                    if (result) {
+                        res.status(200).json({
+                            message: `${templateName} : deployment has been deleted.`
+                        });
+                    } else {
+                        res.status(200).json({
+                            message: `${templateName} : Doesn't exist.`
+                        });
+                    }
 
-            });
-        } else {
+                });
+            } else {
+                res.status(400).json({
+                    message: "Please provide templateName"
+                });
+            }
+
+
+        } catch (error) {
             res.status(400).json({
-                message: "Please provide templateName"
+                message: "Something went wrong :("
             });
-        }
+        };
 
     }
 }
