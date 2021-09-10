@@ -1,11 +1,18 @@
-# ejam-deploment
+# ejam
 
-## Get
+
+## Backend
+[Backend](https://ejam-depl.herokuapp.com/)
+
+
+## API Doc
+### Get
+
 #### GET {{baseURL}}deployment
+____
 
 
-
-## add deployment
+### add deployment
 #### POST {{baseURL}}deployment
 
 Content-Type: application/json
@@ -18,10 +25,8 @@ Content-Type: application/json
 }
 ```
 
-
-
-
-## delete deployment
+____
+### delete deployment
 
 #### DELETE  {{baseURL}}deployment
 
