@@ -14,6 +14,7 @@ module.exports = {
                             id: item._id,
                             version: item.version,
                             deployedAt: item.deployed,
+                            url: item.url,
                             name: item.templateName
                         }
                     });
