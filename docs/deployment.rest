@@ -1,4 +1,5 @@
-@baseURL = https://ejam-depl.herokuapp.com/
+#### @baseURL = https://ejam-depl.herokuapp.com/
+@baseURL = http://localhost:3200/
 ### Get
 GET {{baseURL}}deployment
 
@@ -7,9 +8,9 @@ POST {{baseURL}}deployment
 Content-Type: application/json
 
 {
-    "URL": "https://www.npoint.io/docs/8f7cf8628b367ffd50a2",
-    "templateName": "Bhoot",
-    "version": "1.1.2"
+    "url": "https://www.npoint.io/asasadsds",
+    "templateName": "Hidayt Testasas",
+    "version": "1.0.3"
 }
 
 
