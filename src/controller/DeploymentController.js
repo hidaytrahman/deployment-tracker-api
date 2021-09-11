@@ -3,10 +3,23 @@ const DeploymentSchema = require('../model/Deployment');
 module.exports = {
 
     /*========== Get Deployment =============*/
-    getDeployment: async (req, res) => {
+    getDeployment: (req, res) => {
         try {
-            const data = await DeploymentSchema.find();
-            res.json(data);
+            DeploymentSchema.find().select({ __v: 0 })
+                .exec((err, result) => {
+
+                    // result manipulation according to the reference
+                    const modifiedResult = result.map((item) => {
+                        return {
+                            id: item._id,
+                            version: item.version,
+                            deployedAt: item.deployed,
+                            name: item.templateName
+                        }
+                    });
+
+                    res.status(200).json(modifiedResult);
+                });
 
         } catch (err) {
             res.status(400).json({
@@ -21,17 +34,17 @@ module.exports = {
     addDeployment: async (req, res) => {
 
         try {
-            const { URL, templateName, version } = req.body;
+            const { url, templateName, version } = req.body;
 
             // check if all fields are present
-            if (URL && templateName && version) {
+            if (url && templateName && version) {
 
                 // check if template is already exists
                 const data = await DeploymentSchema.findOne({ templateName: templateName });
 
                 if (!data) {
                     const doc = new DeploymentSchema({
-                        name: URL,
+                        url: url,
                         templateName: templateName,
                         version: [version] // add version as an array
                     });
@@ -58,8 +71,6 @@ module.exports = {
                 } else {
 
                     // check if the version is exist
-                    console.log(' data.version ', data.version);
-
                     const versionExists = data.version.filter((item) => item === version);
 
                     if (versionExists && versionExists.length > 0) {
@@ -68,7 +79,10 @@ module.exports = {
                         })
                     } else {
                         const filter = { templateName };
-                        const update = { version: [...data.version, version] };
+                        const update = {
+                            url: url,
+                            version: [...data.version, version]
+                        };
 
                         let doc = await DeploymentSchema.findOneAndUpdate(filter, update);
 

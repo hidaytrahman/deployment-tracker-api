@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const DeploymentSchema = new mongoose.Schema({
-    URL: String,
+    url: String,
     templateName: {
         type: String,
         required: true
